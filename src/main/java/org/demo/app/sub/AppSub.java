@@ -1,6 +1,7 @@
 package org.demo.app.sub;
 
 import org.demo.app.sub.config.ConfigMail;
+import org.demo.app.sub.config.RabbitBroker1Conf;
 import org.demo.app.sub.services.HelloService;
 import org.demo.rabbitmq.amqp.fwk.RabbitBroker;
 import org.demo.rabbitmq.amqp.fwk.RabbitLogger;
@@ -18,9 +19,14 @@ import com.rabbitmq.client.Connection;
 @SpringBootApplication
 public class AppSub implements CommandLineRunner {
 
+	//--- Configuration 
 	@Autowired 
 	private ConfigMail confMail;
 
+	@Autowired 
+	private RabbitBroker1Conf rabbitBroker1Conf;
+
+	//--- Services 
 	@Autowired 
 	private HelloService helloService;
 	
@@ -36,19 +42,19 @@ public class AppSub implements CommandLineRunner {
     	System.out.println("confMail in 'Application' : getHostName = " + confMail.getHostName());
 
     	helloService.hello("Bob");
+
+    	System.out.println("Rabbit broker configuration :");
+    	System.out.println(rabbitBroker1Conf);
     	
-		RabbitLogger.setOutput(System.out);
+    	// Activate rabbit framework log
+		// RabbitLogger.setOutput(System.out);
 		
-//		ConnectionFactory factory = new ConnectionFactory();
-//		System.out.println("ConnectionFactory created.");
-////		factory.setHost("localhost");
-////		factory.setPort(5672);
-////		factory.setVirtualHost("/");
-//		Connection connection = factory.newConnection("MyConnectionName");
-//		System.out.println("Connection created.");
-		
-		RabbitBroker rabbitBroker = new RabbitBroker();
-		Connection connection = rabbitBroker.newConnection("SUB connection");
+		// Declare broker with specific configuration
+		RabbitBroker rabbitBroker1 = new RabbitBroker(rabbitBroker1Conf);
+
+		System.out.println("Creating connection...");
+		Connection connection = rabbitBroker1.newConnection("SUB connection");
+		System.out.println("Connection created.");
 
 		System.out.println("Starting consumer...");
 		

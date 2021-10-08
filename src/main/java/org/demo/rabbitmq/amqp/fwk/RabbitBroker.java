@@ -34,15 +34,30 @@ public class RabbitBroker {
 //		factory.setVirtualHost("tsevnjtg");
 	}
 	
-	public RabbitBroker(RabbitConfig conf) {
+	public RabbitBroker(RabbitBrokerConfig conf) {
 		super();
 		this.factory = new ConnectionFactory();
+		
+		// Connection detailed configuration
 		if ( conf.getHost() != null ) {
 			factory.setHost(conf.getHost());
 		}
 		if ( conf.getPort() != null ) {
 			factory.setPort(conf.getPort().intValue());
 		}
+		
+		if ( conf.getUserName() != null ) {
+			factory.setUsername(conf.getUserName());
+		}
+		if ( conf.getPassword() != null ) {
+			factory.setPassword(conf.getPassword());
+		}
+		
+		if ( conf.getVirtualHost() != null ) {
+			factory.setVirtualHost(conf.getVirtualHost());
+		}
+		
+		// Connection URI
 		if ( conf.getUri() != null ) {
 			try {
 				factory.setUri(conf.getUri());

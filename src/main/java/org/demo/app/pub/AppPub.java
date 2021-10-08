@@ -34,8 +34,6 @@ public class AppPub implements CommandLineRunner {
 
 		System.out.println("Publishing messages...");
 		
-		//new ConsumerQueueC(connection).consume();
-		
 		RabbitPublisher publisher = new RabbitPublisher(connection, "ex-direct-c");
 		String routingKey = "routing-key-c";
 		

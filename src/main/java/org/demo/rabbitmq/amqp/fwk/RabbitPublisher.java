@@ -11,6 +11,12 @@ public class RabbitPublisher {
 	private final Channel channel; 
 	private final String exchange;
 
+	/**
+	 * Constructor
+	 * @param connection
+	 * @param exchange
+	 * @throws IOException
+	 */
 	public RabbitPublisher(Connection connection, String exchange) throws IOException {
 		super();
 		// Check mandatory arguments
@@ -24,18 +30,39 @@ public class RabbitPublisher {
 		this.exchange = exchange;
 	}
 
+	/**
+	 * Get the channel used by the publisher
+	 * @return
+	 */
 	public Channel getChannel() {
 		return channel;
 	}
 
+	/**
+	 * Get the exchange used by the publisher
+	 * @return
+	 */
 	public String getExchange() {
 		return exchange;
 	}
 
+	/**
+	 * Publish the given message body (without message properties)
+	 * @param messageBody
+	 * @param routingKey
+	 * @throws IOException
+	 */
 	public void publish(String messageBody, String routingKey) throws IOException {
 		publish(messageBody, null, routingKey);
 	}
 	
+	/**
+	 * Publish the given message body with the given message properties
+	 * @param messageBody
+	 * @param messageProperties
+	 * @param routingKey
+	 * @throws IOException
+	 */
 	public void publish(String messageBody, BasicProperties messageProperties, String routingKey) throws IOException {
 		// Check mandatory arguments
 		if ( messageBody == null ) {

@@ -20,16 +20,31 @@ public abstract class RabbitConsumer extends DefaultConsumer {
 
 	private final String queue;
 	
+	/**
+	 * Constructor
+	 * @param connection  the connection to the broker
+	 * @param queue  the queue from which to receive messages 
+	 * @throws IOException
+	 */
 	public RabbitConsumer(Connection connection, String queue) throws IOException {
 		super(connection.createChannel());
 		this.queue = queue;
 	}
 
+	/**
+	 * Start consuming messages from the queue 
+	 * @throws IOException
+	 */
 	public void consume() throws IOException {
 		Channel channel = super.getChannel();
 		channel.basicConsume(queue, this);
 	}
 	
+	/**
+	 * Get redelivery count (provided by 'x-delivery-count' message header)
+	 * @param messageProperties
+	 * @return
+	 */
 	protected long getRedeliveryCount(BasicProperties messageProperties) {
 		if ( messageProperties != null ) {
 			Map<String, Object> headers = messageProperties.getHeaders();
@@ -49,9 +64,13 @@ public abstract class RabbitConsumer extends DefaultConsumer {
 	}
 
 	/**
-	 * Message processing method
+	 * Message processing method (to be implemented in concrete class)
 	 * @param messageBody
 	 * @param messageProperties
+	 * @return type of acknowledge : <br>
+	 *  - ACK_MESSAGE : normal end of processing, the message is removed from the queue <br>
+	 *  - REJECT_MESSAGE : processing error, the message is rejected (removed from the queue) and goes to DLQ if any<br>
+	 *  - REQUEUE_MESSAGE : processing error, the message is requeued (NB: can become a 'poison message')
 	 */
 	protected abstract Ack processMessage(String messageBody, BasicProperties messageProperties) ;
 	
@@ -77,12 +96,6 @@ public abstract class RabbitConsumer extends DefaultConsumer {
 				requeueMessage(envelope); 
 				return;
 			}
-//			// Normal end of message processing => ACK
-//			ackMessage(envelope);
-//		} catch (RejectMessageException e) {
-//			rejectMessage(envelope);
-//		} catch (RequeueMessageException e) {
-//			requeueMessage(envelope); 
 		} catch ( Exception ex ) {
 			rejectMessage(envelope);
 		}

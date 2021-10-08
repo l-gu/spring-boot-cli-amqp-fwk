@@ -14,29 +14,37 @@ public class RabbitLogger {
 	public static void setOutput(PrintStream output) {
 		out = output ;
 	}
-
+	private static boolean isNotActive() {
+		return out == null ;
+	}
+	
 	public static void println(String msg) {
 		if ( out != null ) {
-			out.println(msg);
+			out.println("[RabbitLogger] " + msg);
 		}
 	}
 
 	public static void printMessageBody(Delivery message) throws UnsupportedEncodingException {
+		if ( isNotActive( ) ) return;
 		printMessageBody(message.getBody());
 	}
 
 	public static void printMessageBody(byte[] body) throws UnsupportedEncodingException {
+		if ( isNotActive( ) ) return;
 		printMessageBody( new String(body, "UTF-8") );
 	}
 	public static void printMessageBody(String body) throws UnsupportedEncodingException {
+		if ( isNotActive( ) ) return;
 		println(". message body : " + body );
 	}
 
 	public static void printMessageProperties(Delivery message) {
+		if ( isNotActive( ) ) return;
 		printMessageProperties(message.getProperties());
 	}
 
 	public static void printMessageProperties(BasicProperties properties) {
+		if ( isNotActive( ) ) return;
 		// Spec AMQP : "Immutable properties of the message. MUST remain unaltered"
 		// BasicProperties : getXxx only (no setXxx )
 		if (properties != null) {
@@ -66,6 +74,7 @@ public class RabbitLogger {
 	}
 
 	public static void printException(Exception exception) {
+		if ( isNotActive( ) ) return;
 		println("Exception : " + exception != null ? exception.getClass().getSimpleName() : "null");
 	}
 

@@ -18,17 +18,21 @@ public class ConsumerQueueC extends RabbitConsumer {
 	@Override
 	protected Ack processMessage(String messageBody, BasicProperties messageProperties) {
 		System.out.println("Subscriber : processing message : " + messageBody);
+		
+		// Check max redelivery count to avoid poison messages (to move in fwk ?)
 		if ( getRedeliveryCount(messageProperties) > 2 ) {
-			//rejectMessage();
+			System.out.println(" -> REJECT_MESSAGE (redelivery count > max)");
 			return Ack.REJECT_MESSAGE;
 		}
+		
+		// Process message
 		sleep(1000L);
 		if ( messageBody.contains("OOPS") ) {
-			//rejectMessage();
+			System.out.println(" -> REJECT_MESSAGE");
 			return Ack.REJECT_MESSAGE;
 		}
 		else if ( messageBody.contains("ARGH") ) {
-			//requeueMessage();
+			System.out.println(" -> REQUEUE_MESSAGE");
 			return Ack.REQUEUE_MESSAGE;
 
 			// this message will become a "poison message"
@@ -38,6 +42,7 @@ public class ConsumerQueueC extends RabbitConsumer {
 		}
 		else {
 			// Normal processing => ACK MESSAGE
+			System.out.println(" -> ACK_MESSAGE");
 			return Ack.ACK_MESSAGE;
 		}
 	}
